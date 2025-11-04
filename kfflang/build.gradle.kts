@@ -66,11 +66,11 @@ dependencies {
     minecraft("net.minecraftforge:forge:$mc_version-$forge_version")
 
     // Default classpath
-    api(kotlin("stdlib"))
-    api(kotlin("stdlib-common"))
-    api(kotlin("stdlib-jdk8"))
-    api(kotlin("stdlib-jdk7"))
-    api(kotlin("reflect"))
+    api(kotlin("stdlib", kotlin_version))
+    api(kotlin("stdlib-common", kotlin_version))
+    api(kotlin("stdlib-jdk8", kotlin_version))
+    api(kotlin("stdlib-jdk7", kotlin_version))
+    api(kotlin("reflect", kotlin_version))
 }
 
 tasks {
@@ -92,7 +92,7 @@ tasks {
 
     // Only require the lang provider to use explicit visibility modifiers, not the test mod
     withType<KotlinCompile> {
-        kotlinOptions.freeCompilerArgs = listOf("-Xexplicit-api=warning", "-Xjvm-default=all")
+        compilerOptions.freeCompilerArgs.set(listOf("-Xexplicit-api=warning", "-Xjvm-default=all"))
     }
 }
 

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm")
     id("net.minecraftforge.gradle") version "5.1.+"
@@ -9,9 +7,9 @@ plugins {
 }
 
 // Current KFF version
-val kffVersion = "3.12.0"
+val kffVersion = "3.13.0"
 val kffMaxVersion = "4.0.0"
-val kffGroup = "thedarkcolour"
+val kffGroup = "xyz.bluspring"
 
 allprojects {
     version = kffVersion
@@ -25,6 +23,9 @@ val forge_version: String by project
 
 val coroutines_version: String by project
 val serialization_version: String by project
+val datetime_version: String by project
+val atomicfu_version: String by project
+val io_version: String by project
 
 val shadow: Configuration by configurations.creating {
     exclude("org.jetbrains", "annotations")
@@ -87,11 +88,19 @@ dependencies {
     shadow("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${coroutines_version}")
     shadow("org.jetbrains.kotlinx:kotlinx-serialization-core:${serialization_version}")
     shadow("org.jetbrains.kotlinx:kotlinx-serialization-json:${serialization_version}")
+    shadow("org.jetbrains.kotlinx:kotlinx-datetime-jvm:${datetime_version}")
+    shadow("org.jetbrains.kotlinx:atomicfu-jvm:${atomicfu_version}")
+    shadow("org.jetbrains.kotlinx:kotlinx-io-core-jvm:${io_version}")
+    shadow("org.jetbrains.kotlinx:kotlinx-io-bytestring-jvm:${io_version}")
 
     // KFF Modules
     implementation(include(project(":kfflang"), kffMaxVersion))
     implementation(include(project(":kfflib"), kffMaxVersion))
     implementation(include(project(":kffmod"), kffMaxVersion))
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 tasks {
@@ -122,10 +131,6 @@ tasks {
         }
     }
 
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
-
     assemble {
         dependsOn(jarJar)
     }
@@ -136,6 +141,23 @@ publishing {
         register<MavenPublication>("maven") {
             suppressAllPomMetadataWarnings() // Shush
             from(components["java"])
+        }
+    }
+}
+
+subprojects {
+    publishing {
+        publications {
+            repositories {
+                maven("https://mvn.devos.one/releases") {
+                    name = "devOS"
+
+                    credentials {
+                        username = System.getenv()["MAVEN_USER"]
+                        password = System.getenv()["MAVEN_PASS"]
+                    }
+                }
+            }
         }
     }
 }
